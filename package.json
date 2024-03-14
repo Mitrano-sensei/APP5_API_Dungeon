@@ -1,15 +1,16 @@
 {
-  "name": "app5_api_dungeon",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "app5-api-dungeon",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.3",
-    "prisma": "^5.11.0"
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "hbs": "~4.0.4",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
   }
 }
