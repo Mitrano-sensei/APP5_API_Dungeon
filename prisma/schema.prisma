@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,24 @@ generator client {
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+model Player {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  scores Score[] @relation("PlayerToScore")
+}
+
+model Dungeon {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  Score Score[]
+}
+
+model Score {
+  id        Int      @id @default(autoincrement())
+  dungeonId Int
+  points    Int
+  dungeon   Dungeon  @relation(fields: [dungeonId], references: [id])
+  group     Player[] @relation("PlayerToScore")
 }
