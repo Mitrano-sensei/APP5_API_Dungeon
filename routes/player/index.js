@@ -21,4 +21,32 @@ router.post("/", async (req, res) => {
     res.status(201).json(player);
 });
 
+router.delete("/", async (req, res)=>{
+	const {id}= req.body;
+	
+	const player =await client.player.delete({
+	  where: { id: id},
+	});
+    res.status(201).json(player);
+	
+});
+
+router.put("/", async (req, res)=>{
+	const {id,name}= req.body;
+	let notValid = !name;
+    if(notValid){
+        createError(404);
+        return;
+    }
+
+    const player =await client.player.update({
+        where: { id: id},
+        data: { name: name },
+    });
+	
+    res.status(201).json(player);
+	
+});
+
+
 module.exports = router;

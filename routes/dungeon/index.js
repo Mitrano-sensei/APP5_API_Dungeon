@@ -21,4 +21,31 @@ router.post("/", async (req, res) => {
     res.status(201).json(dungeon);
 });
 
+router.delete("/", async (req, res)=>{
+	const {id}= req.body;
+	
+	const dungeon =await client.dungeon.delete({
+	  where: { id: id },
+	});
+    res.status(201).json(dungeon);
+	
+});
+
+router.put("/", async (req, res)=>{
+	const {id,name}= req.body;
+	let notValid = !name;
+    if(notValid){
+        createError(404);
+        return;
+    }
+
+    const dungeon =await client.dungeon.update({
+        where: { id: id},
+        data: { name: name },
+    });
+	
+    res.status(201).json(dungeon);
+	
+});
+
 module.exports = router;
