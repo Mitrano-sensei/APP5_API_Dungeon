@@ -7,5 +7,6 @@ var router = express.Router();
 // });
 
 router.use('/players', require('./player'));
+router.use('/dungeons', require('./dungeon'));
 
 module.exports = router;
