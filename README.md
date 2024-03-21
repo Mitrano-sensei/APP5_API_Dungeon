@@ -8,6 +8,5 @@
 
 
 # Running through docker image
-- Install docker
-- Run `docker build -t dungeon_api .`
-      `docker run --name dungeon-api -p 3000:3000 -d dungeon_api`
+- Install docker/docker compose
+- Run `docker compose up`
