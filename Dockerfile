@@ -19,6 +19,7 @@ COPY --chown=node:node . .
 RUN npx prisma db pull
 RUN npx prisma migrate dev
 RUN npx prisma generate
+RUN npx prisma db seed
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
