@@ -1,7 +1,22 @@
 const { Router } = require("express");
 const { client } = require("../../prisma/database");
+const {pagesize}=require("../../queryConfig");
 
 const router = Router();
+
+//Pagination
+router.get("/",async (req,res)=>{
+    var {page} =req.body;
+    if(page===undefined || page==0){
+        page=1;
+    }
+    const players=await client.player.findMany({
+        skip: (page-1)*pagesize,
+        take: pagesize,
+    })
+
+    res.status(200).json(players);
+});
 
 // Récupérer tous les livres
 router.get("/", async (req, res) => {
