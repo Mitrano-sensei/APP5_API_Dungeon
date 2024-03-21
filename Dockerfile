@@ -16,7 +16,6 @@ RUN npm install
 
 COPY --chown=node:node . .
 
-# TODO : Add fixtures/seeding data
 RUN npx prisma db pull
 RUN npx prisma migrate dev
 RUN npx prisma generate
