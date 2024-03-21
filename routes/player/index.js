@@ -5,9 +5,9 @@ const {pagesize}=require("../../queryConfig");
 const router = Router();
 
 //Pagination
-router.get("/",async (req,res)=>{
-    var {page} =req.body;
-    if(page===undefined || page==0){
+router.get("/:page",async (req,res)=>{
+    var {page} =req.params;
+    if(page===undefined || page<=0){
         page=1;
     }
     const players=await client.player.findMany({
