@@ -1,0 +1,54 @@
+openapi: 3.0.0
+info:
+  title: Documentation de l'API
+  description: API pour voir les tableaux de scores des donjons
+  version: 1.0.0
+
+paths:
+  /api/players/:
+    get:
+      parameters:
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+      description: Donne la liste des joueurs
+      responses:
+        '200':
+          description: Récupération de la liste des joueurs réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+    
+    post :
+      description: Ajoute un joueur
+      responses:
+        '201':
+          description: Insertion du nouveau joueur réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+      
+        
+                    
+    
