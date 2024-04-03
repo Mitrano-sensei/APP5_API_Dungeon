@@ -6,13 +6,14 @@ const router = Router();
 
 // Get all dungeons
 router.get("/", async (req, res) => {
-    var {page} = req.query;
+    var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
     }
+    var take = (size === undefined || size <= 0) ? pagesize : size;
     const dungeons=await client.dungeon.findMany({
-        skip: (page-1)*pagesize,
-        take: pagesize,
+        skip: (page-1)*take,
+        take: take,
     })
     res.status(200).json(dungeons);
 });

@@ -6,13 +6,14 @@ const router = Router();
 
 // Récupérer tous les livres
 router.get("/", async (req, res) => {
-    var {page} = req.query;
+    var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
     }
+    var take = (size === undefined || size <= 0) ? pagesize : size;
     const players=await client.player.findMany({
-        skip: (page-1)*pagesize,
-        take: pagesize,
+        skip: (page-1)*take,
+        take: take,
     })
     res.status(200).json(players);
 });
