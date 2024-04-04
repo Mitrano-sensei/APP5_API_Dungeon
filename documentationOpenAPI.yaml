@@ -64,7 +64,118 @@ paths:
                     type: integer
                   name:
                     type: string
+  /api/players/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du joueur
+          schema:
+            type: integer
+          required: true
+        
+      description: Donne les informations du joueur
+      responses:
+        '200':
+          description: Récupération des informations du joueur réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+
+
+
+    put: 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID du joueur
+      description: Modifie un joueur
       
+      responses:
+        '201':
+          description: Modification du joueur réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+        '404':
+          description: Nom Invalide, ou joueur non trouvé, ou erreur durant la modification 
+          content:
+            text/plain:
+              schema:
+                type: string
+    
+    delete: 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID du joueur
+      description: Supprime un joueur
+      
+      responses:
+        '201':
+          description: Suppression du joueur réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+        '404':
+          description: Joueur non trouvé 
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/players/name/{name}:
+    get:
+      parameters:
+        - name: name
+          in: path
+          description: Le pseudo du joueur
+          schema:
+            type: string
+          required: true
+        
+      description: Donne les informations du joueur
+      responses:
+        '200':
+          description: Récupération des informations du joueur réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+          
+
         
                     
     
