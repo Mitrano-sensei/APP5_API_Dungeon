@@ -40,6 +40,18 @@ paths:
     
     post :
       description: Ajoute un joueur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  uniqueItems: true
       responses:
         '201':
           description: Insertion du nouveau joueur réussie
