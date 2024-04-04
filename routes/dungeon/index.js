@@ -46,7 +46,7 @@ router.put("/:id", async (req, res)=>{
 
 	let notValid = !name;
     if(notValid){
-        res.status(404).send("Dungeon not found");
+        res.status(404).send("Invalid name");
         return;
     }
 
