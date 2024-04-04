@@ -46,7 +46,7 @@ router.put("/:id", async (req, res)=>{
     
 	let notValid = !name;
     if(notValid){
-        createError(404);
+        res.status(404).send("Player not found");
         return;
     }
 
