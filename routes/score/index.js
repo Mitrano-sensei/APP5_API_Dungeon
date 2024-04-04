@@ -70,39 +70,58 @@ router.delete("/:id", async (req, res)=>{
 
 router.put("/", async (req, res)=>{
     const {id, dungeonId, playerIds, points } = req.body;
-    if(id === undefined) { return res.status(400).send("Missing id"); }
+    let score;
 
-    const oldScore = client.score.findUnique({where: {id: parseInt(id)}});
-    let data = {}
-
-    if(!dungeonId) { data["dungeonId"] = {connect: dungeonId}; }
-    else { data["dungeonId"] = {connect: oldScore["dungeonId"]}; }
-
-    if(!points) { data["points"] = points; }
-    else { data["points"] = oldScore["points"]; }
-
-    if(playerIds !== undefined){
-        let players = [];
-        for(let i=0; i<playerIds.length; i++)
-        {
-            players.push({id: playerIds[i]});
-        }
-        data["group"] = {connect: players};
-    }
-    else { data["group"] = oldScore["group"]; }
-
-    await client.score.delete({
-        where: { id: parseInt(id)}
-    });
-
-    console.log(data);
-    const score = await client.score.create({
-        data: data,
+    if (!id) res.status(400).json({error: "Missing id"});
+    const oldScore = await client.score.findUnique({
+        where: { id: parseInt(id) },
         include: {
             group: true
         }
     });
-    console.log(data);
+
+    if (!oldScore) return res.status(400).json({error: "Score not found"});
+
+    const newGroup = [];
+
+    if (dungeonId){
+        const dungeon = await client.dungeon.findUnique({
+            where: { id: parseInt(dungeonId) }
+        })
+        if (!dungeon) return res.status(400).json({error: "Dungeon not found"});
+    }
+
+    const data = {
+        dungeon: {connect: {id: dungeonId ? parseInt(dungeonId) : parseInt(oldScore.dungeonId)}},
+        points: points ? parseInt(points) : parseInt(oldScore.points),
+        group: {connect: []}    // Ignored in case of update
+    }
+
+    if (!playerIds || (playerIds.length === 0 && playerIds != oldScore.group.map(p => p.id))) {
+        score = await client.score.update({
+            where: { id: parseInt(id) },
+            data: data,
+            include: {
+                group: true
+            }
+        });
+    } else {
+        // In that case, delete the old score and replace it with a new connection.
+        for (let i=0; i<playerIds.length; i++) {
+            newGroup.push({id: playerIds[i]});
+        }
+
+        data.group = {connect: newGroup};
+        await client.score.delete({
+            where: { id: parseInt(id) }
+        });
+        score = await client.score.create({
+            data: data,
+            include: {
+                group: true
+            }
+        });
+    }
 
     return res.status(201).json(score);
 });
