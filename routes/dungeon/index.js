@@ -30,8 +30,8 @@ router.post("/", async (req, res) => {
     res.status(201).json(dungeon);
 });
 
-router.delete("/", async (req, res)=>{
-	const {id}= req.body;
+router.delete("/:id", async (req, res)=>{
+	const {id}= req.params;
 	
 	const dungeon =await client.dungeon.delete({
 	  where: { id: id },

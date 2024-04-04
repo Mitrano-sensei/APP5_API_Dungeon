@@ -8,5 +8,6 @@ var router = express.Router();
 
 router.use('/players', require('./player'));
 router.use('/dungeons', require('./dungeon'));
+router.use('/scores', require('./score'));
 
 module.exports = router;

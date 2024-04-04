@@ -30,8 +30,8 @@ router.post("/", async (req, res) => {
     res.status(201).json(player);
 });
 
-router.delete("/", async (req, res)=>{
-	const {id}= req.body;
+router.delete("/:id", async (req, res)=>{
+	const {id}= req.params;
 	
 	const player =await client.player.delete({
 	  where: { id: id},
