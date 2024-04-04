@@ -100,6 +100,19 @@ paths:
           required: true
           description: ID du joueur
       description: Modifie un joueur
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  uniqueItems: true
       
       responses:
         '201':
@@ -174,6 +187,194 @@ paths:
                     type: integer
                   name:
                     type: string
+
+
+  /api/dungeons/:
+    get:
+      parameters:
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+            default: 1
+          required: false
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+            default: 5
+          required: false
+      description: Donne la liste des donjons
+      responses:
+        '200':
+          description: Récupération de la liste des donjon réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+    
+    post :
+      description: Ajoute un donjon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  uniqueItems: true
+      responses:
+        '201':
+          description: Insertion du nouveau donjon réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+  /api/dungeons/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du donjon
+          schema:
+            type: integer
+          required: true
+        
+      description: Donne les informations du donjon
+      responses:
+        '200':
+          description: Récupération des informations du donjon réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+
+
+
+    put: 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID du donjon
+      description: Modifie un donjon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  uniqueItems: true
+      
+      responses:
+        '201':
+          description: Modification du donjon réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+        '404':
+          description: Nom Invalide, ou donjon non trouvé, ou erreur durant la modification 
+          content:
+            text/plain:
+              schema:
+                type: string
+    
+    delete: 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID du donjon
+      description: Supprime un donjon
+      
+      responses:
+        '201':
+          description: Suppression du donjon réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+        '404':
+          description: Donjon non trouvé 
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/dungeons/name/{name}:
+    get:
+      parameters:
+        - name: name
+          in: path
+          description: Le pseudo du donjon
+          schema:
+            type: string
+          required: true
+        
+      description: Donne les informations du donjon
+      responses:
+        '200':
+          description: Récupération des informations du donjon réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+          
+
+        
+                    
+    
           
 
         
