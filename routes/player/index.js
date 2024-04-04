@@ -30,26 +30,28 @@ router.post("/", async (req, res) => {
     res.status(201).json(player);
 });
 
-router.delete("/", async (req, res)=>{
-	const {id}= req.body;
-	
+router.delete("/:id", async (req, res)=>{
+	const {id}= req.params;
+
 	const player =await client.player.delete({
-	  where: { id: id},
+	  where: { id: parseInt(id)},
 	});
     res.status(201).json(player);
 	
 });
 
-router.put("/", async (req, res)=>{
-	const {id,name}= req.body;
+router.put("/:id", async (req, res)=>{
+	const {id} = req.params;
+    const {name}= req.body;
+    
 	let notValid = !name;
     if(notValid){
-        createError(404);
+        res.status(404).send("Invalid name");
         return;
     }
 
     const player =await client.player.update({
-        where: { id: id},
+        where: { id: parseInt(id)},
         data: { name: name },
     });
 	
