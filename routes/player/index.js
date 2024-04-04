@@ -59,7 +59,10 @@ router.delete("/", async (req, res)=>{
 	
 	const player =await client.player.delete({
 	  where: { id: id},
-	});
+	}).catch((e)=>{
+        res.status(404).send("Player not found");
+        return;
+    });
     res.status(201).json(player);
 	
 });
@@ -75,7 +78,10 @@ router.put("/", async (req, res)=>{
     const player =await client.player.update({
         where: { id: id},
         data: { name: name },
-    });
+    }).catch((e)=>{
+        res.status(404).send("Player not found or Error while updating player.");
+        return;
+    });;
 	
     res.status(201).json(player);
 	

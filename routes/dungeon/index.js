@@ -60,7 +60,10 @@ router.delete("/", async (req, res)=>{
 	
 	const dungeon =await client.dungeon.delete({
 	  where: { id: id },
-	});
+	}).catch((e)=>{
+        res.status(404).send("Dungeon not found");
+        return;
+    });
     res.status(201).json(dungeon);
 	
 });
@@ -76,6 +79,9 @@ router.put("/", async (req, res)=>{
     const dungeon =await client.dungeon.update({
         where: { id: id},
         data: { name: name },
+    }).catch((e)=>{
+        res.status(404).send("Dungeon not found");
+        return;
     });
 	
     res.status(201).json(dungeon);
