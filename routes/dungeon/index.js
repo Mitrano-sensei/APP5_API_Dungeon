@@ -21,7 +21,15 @@ router.get("/:page",async (req,res)=>{
 
 // Get all dungeons
 router.get("/", async (req, res) => {
-    const dungeons = await client.dungeon.findMany();
+    var {page, size} = req.query;
+    if(page===undefined || page<=0){
+        page=1;
+    }
+    var take = (size === undefined || size <= 0) ? pagesize : size;
+    const dungeons=await client.dungeon.findMany({
+        skip: (page-1)*take,
+        take: take,
+    })
     res.status(200).json(dungeons);
 });
 
