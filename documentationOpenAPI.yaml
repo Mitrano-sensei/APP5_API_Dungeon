@@ -13,11 +13,15 @@ paths:
           description: Le numéro de la page
           schema:
             type: integer
+            default: 1
+          required: false
         - name: size
           in: query
           description: La taille de la page
           schema:
             type: integer
+            default: 5
+          required: false
       description: Donne la liste des joueurs
       responses:
         '200':
