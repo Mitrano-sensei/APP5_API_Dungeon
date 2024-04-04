@@ -33,6 +33,31 @@ router.get("/", async (req, res) => {
     res.status(200).json(dungeons);
 });
 
+router.get("/:id", async (req, res) => {
+
+    const { id } = req.params;
+    const dungeon = await client.dungeon.findUnique({
+        where: { id: parseInt(id) }
+    });
+    if(dungeon === null){
+        res.status(404).send("Dungeon not found");
+        return;
+    }
+    res.status(200).json(dungeon);
+});
+
+router.get("/name/:name", async (req, res) => { 
+    const { name } = req.params;
+    const dungeon = await client.dungeon.findUnique({
+        where: { name: name }
+    });
+    if(dungeon === null){
+        res.status(404).send("Dungeon not found");
+        return;
+    }
+    res.status(200).json(dungeon);
+});
+
 router.post("/", async (req, res) => { 
     const { name } = req.body;
     // TODO : Validation
@@ -45,27 +70,35 @@ router.post("/", async (req, res) => {
     res.status(201).json(dungeon);
 });
 
-router.delete("/", async (req, res)=>{
-	const {id}= req.body;
+router.delete("/:id", async (req, res)=>{
+	const {id}= req.params;
 	
 	const dungeon =await client.dungeon.delete({
-	  where: { id: id },
-	});
+	  where: { id: parseInt(id) },
+	}).catch((e)=>{
+        res.status(404).send("Dungeon not found");
+        return;
+    });
     res.status(201).json(dungeon);
 	
 });
 
-router.put("/", async (req, res)=>{
-	const {id,name}= req.body;
+router.put("/:id", async (req, res)=>{
+	const {id} = req.params;
+    const {name}= req.body;
+
 	let notValid = !name;
     if(notValid){
-        createError(404);
+        res.status(404).send("Invalid name");
         return;
     }
 
     const dungeon =await client.dungeon.update({
-        where: { id: id},
+        where: { id: parseInt(id)},
         data: { name: name },
+    }).catch((e)=>{
+        res.status(404).send("Dungeon not found");
+        return;
     });
 	
     res.status(201).json(dungeon);
