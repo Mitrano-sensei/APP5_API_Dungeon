@@ -30,18 +30,20 @@ router.post("/", async (req, res) => {
     res.status(201).json(dungeon);
 });
 
-router.delete("/", async (req, res)=>{
-	const {id}= req.body;
+router.delete("/:id", async (req, res)=>{
+	const {id}= req.params;
 	
 	const dungeon =await client.dungeon.delete({
-	  where: { id: id },
+	  where: { id: parseInt(id) },
 	});
     res.status(201).json(dungeon);
 	
 });
 
-router.put("/", async (req, res)=>{
-	const {id,name}= req.body;
+router.put("/:id", async (req, res)=>{
+	const {id} = req.params;
+    const {name}= req.body;
+
 	let notValid = !name;
     if(notValid){
         createError(404);
@@ -49,7 +51,7 @@ router.put("/", async (req, res)=>{
     }
 
     const dungeon =await client.dungeon.update({
-        where: { id: id},
+        where: { id: parseInt(id)},
         data: { name: name },
     });
 	
