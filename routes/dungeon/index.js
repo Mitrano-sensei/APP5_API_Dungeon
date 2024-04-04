@@ -18,6 +18,31 @@ router.get("/", async (req, res) => {
     res.status(200).json(dungeons);
 });
 
+router.get("/:id", async (req, res) => {
+
+    const { id } = req.params;
+    const dungeon = await client.dungeon.findUnique({
+        where: { id: parseInt(id) }
+    });
+    if(dungeon === null){
+        res.status(404).send("Dungeon not found");
+        return;
+    }
+    res.status(200).json(dungeon);
+});
+
+router.get("/name/:name", async (req, res) => { 
+    const { name } = req.params;
+    const dungeon = await client.dungeon.findUnique({
+        where: { name: name }
+    });
+    if(dungeon === null){
+        res.status(404).send("Dungeon not found");
+        return;
+    }
+    res.status(200).json(dungeon);
+});
+
 router.post("/", async (req, res) => { 
     const { name } = req.body;
     // TODO : Validation

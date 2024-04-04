@@ -18,6 +18,30 @@ router.get("/", async (req, res) => {
     res.status(200).json(players);
 });
 
+router.get("/:id", async (req, res) => {
+    const { id } = req.params;
+    const player = await client.player.findUnique({
+        where: { id: parseInt(id) }
+    });
+    if(player === null){
+        res.status(404).send("Player not found");
+        return;
+    }
+    res.status(200).json(player);
+});
+
+router.get("/name/:name", async (req, res) => {
+    const { name } = req.params;
+    const player = await client.player.findUnique({
+        where: { name: name }
+    });
+    if(player === null){
+        res.status(404).send("Player not found");
+        return;
+    }
+    res.status(200).json(player);
+});
+
 router.post("/", async (req, res) => { 
     const { name } = req.body;
     // TODO : Validation
