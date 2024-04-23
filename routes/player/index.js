@@ -26,8 +26,8 @@ router.get("/", async (req, res) => {
     }
     var take = (size === undefined || size <= 0) ? pagesize : size;
     const players=await client.player.findMany({
-        skip: (page-1)*take,
-        take: take,
+        skip: parseInt((page-1)*take),
+        take: parseInt(take),
     })
     res.status(200).json(players);
 });
