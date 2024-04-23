@@ -28,6 +28,7 @@ router.get("/", async (req, res) => {
     res.status(200).json(scores);
 });
 
+// Get score for an id
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const score = await client.score.findUnique({
@@ -35,6 +36,56 @@ router.get("/:id", async (req, res) => {
     });
     if(score === null){
         res.status(404).send("Player not found");
+        return;
+    }
+    res.status(200).json(score);
+});
+
+// Get score for a player
+router.get("/player/:id", async (req, res) => {
+    const { id } = req.params;
+    const { page, size } = req.query;
+    
+    // Make sure they are Int
+    page = parseInt(page);
+    size = parseInt(size);
+
+    var take = (size === undefined || size <= 0) ? pagesize : size;
+
+    const score = await client.score.findMany({
+        where: { group: {some: {id: parseInt(id)}} },
+        page: page,
+        take: take,
+        include: {
+            group: true
+        }
+    });
+    if(score === null){
+        res.status(404).send("Player not found");
+        return;
+    }
+    res.status(200).json(score);
+});
+
+// Get score for a dungeon
+router.get("/dungeon/:id", async (req, res) => {
+    const { id } = req.params;
+    const { page, size } = req.query;
+    
+    // Make sure they are Int
+    page = parseInt(page);
+    size = parseInt(size);
+    
+    const score = await client.score.findMany({
+        where: { dungeonId: parseInt(id) },
+        page: page,
+        take: take,
+        include: {
+            group: true
+        }
+    });
+    if(score === null){
+        res.status(404).send("Dungeon not found");
         return;
     }
     res.status(200).json(score);
