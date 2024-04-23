@@ -44,17 +44,19 @@ router.get("/:id", async (req, res) => {
 // Get score for a player
 router.get("/player/:id", async (req, res) => {
     const { id } = req.params;
-    const { page, size } = req.query;
+    var { page, size } = req.query;
+    if(page===undefined || page<=0){
+        page=1;
+    } 
+    var take = (size === undefined || parseInt(size) <= 0) ? pagesize : size;
     
     // Make sure they are Int
     page = parseInt(page);
-    size = parseInt(size);
-
-    var take = (size === undefined || size <= 0) ? pagesize : size;
+    take = parseInt(take);
 
     const score = await client.score.findMany({
         where: { group: {some: {id: parseInt(id)}} },
-        page: page,
+        skip: (page-1)*take,
         take: take,
         include: {
             group: true
@@ -70,15 +72,19 @@ router.get("/player/:id", async (req, res) => {
 // Get score for a dungeon
 router.get("/dungeon/:id", async (req, res) => {
     const { id } = req.params;
-    const { page, size } = req.query;
+    var { page, size } = req.query;
+    if(page===undefined || page<=0){
+        page=1;
+    } 
+    var take = (size === undefined || parseInt(size) <= 0) ? pagesize : size;
     
     // Make sure they are Int
     page = parseInt(page);
-    size = parseInt(size);
+    take = parseInt(take);
     
     const score = await client.score.findMany({
         where: { dungeonId: parseInt(id) },
-        page: page,
+        skip: (page-1)*take,
         take: take,
         include: {
             group: true
