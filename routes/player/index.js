@@ -70,6 +70,7 @@ router.post("/", async (req, res) => {
 
 router.delete("/:id", async (req, res)=>{
 	const {id}= req.params;
+
 	const player =await client.player.delete({
 	  where: { id: parseInt(id)},
 	}).catch((e)=>{
