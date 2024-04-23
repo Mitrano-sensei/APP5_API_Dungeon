@@ -523,14 +523,14 @@ paths:
                 properties:
                   id:
                     type: integer
-                dungeonId:
-                  type: integer
-                points:
-                  type: integer
-                playerIds:
-                  type: array
-                  items:
+                  dungeonId:
                     type: integer
+                  points:
+                    type: integer
+                  playerIds:
+                    type: array
+                    items:
+                      type: integer
 
         '404':
           description: Nom Invalide, ou score non trouvé, ou erreur durant la modification 
@@ -575,5 +575,104 @@ paths:
               schema:
                 type: string
 
- 
-    
+  /api/scores/player/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du joueur
+          schema:
+            type: integer
+          required: true
+
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+            default: 1
+          required: false
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+            default: 5
+          required: false
+        
+      description: Donne les scores du joueur
+      responses:
+        '200':
+          description: Récupération des informations réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    dungeonId:
+                      type: integer
+                    points:
+                      type: integer
+                    playerIds:
+                      type: array
+                      items:
+                        type: integer
+
+  /api/scores/dungeon/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du joueur
+          schema:
+            type: integer
+          required: true
+
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+            default: 1
+          required: false
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+            default: 5
+          required: false
+        
+      description: Donne les scores du donjon
+      responses:
+        '200':
+          description: Récupération des informations réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    dungeonId:
+                      type: integer
+                    points:
+                      type: integer
+                    playerIds:
+                      type: array
+                      items:
+                        type: integer
+
+
+  
+      
+
+
+  
+      
