@@ -28,6 +28,18 @@ router.get("/", async (req, res) => {
     res.status(200).json(scores);
 });
 
+router.get("/:id", async (req, res) => {
+    const { id } = req.params;
+    const score = await client.score.findUnique({
+        where: { id: parseInt(id) }
+    });
+    if(score === null){
+        res.status(404).send("Player not found");
+        return;
+    }
+    res.status(200).json(score);
+});
+
 // Create a score
 router.post("/", async (req, res) => { 
     const { dungeonId, playerIds, points  } = req.body;
@@ -68,8 +80,9 @@ router.delete("/:id", async (req, res)=>{
 	
 });
 
-router.put("/", async (req, res)=>{
-    const {id, dungeonId, playerIds, points } = req.body;
+router.put("/:id", async (req, res)=>{
+    const {id} = req.params;
+    const {dungeonId, playerIds, points } = req.body;
     let score;
 
     if (!id) res.status(400).json({error: "Missing id"});
