@@ -137,6 +137,8 @@ router.delete("/:id", async (req, res)=>{
 	
 });
 
+// Update a score
+// In some cases we have to recreate a score instead of updating it
 router.put("/:id", async (req, res)=>{
     const {id} = req.params;
     const {dungeonId, playerIds, points } = req.body;

@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
     res.status(200).json(dungeons);
 });
 
+// Get dungeon by id
 router.get("/:id", async (req, res) => {
 
     const { id } = req.params;
@@ -31,6 +32,7 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(dungeon);
 });
 
+// Get dungeon by name
 router.get("/name/:name", async (req, res) => { 
     const { name } = req.params;
     const dungeon = await client.dungeon.findUnique({

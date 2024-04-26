@@ -18,7 +18,7 @@ router.get("/:page",async (req,res)=>{
     res.status(200).json(players);
 });
 
-// Récupérer tous les livres
+// Get all players
 router.get("/", async (req, res) => {
     var {page, size} = req.query;
     if(page===undefined || page<=0){
@@ -32,6 +32,7 @@ router.get("/", async (req, res) => {
     res.status(200).json(players);
 });
 
+// Get player by id
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const player = await client.player.findUnique({
@@ -44,6 +45,7 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(player);
 });
 
+// Get player by name
 router.get("/name/:name", async (req, res) => {
     const { name } = req.params;
     const player = await client.player.findUnique({
