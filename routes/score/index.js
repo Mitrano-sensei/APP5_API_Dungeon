@@ -6,7 +6,7 @@ const router = Router();
 
 // Get all scores
 router.get("/", async (req, res) => {
-    var {page, size} = req.query;
+    var {page, size, min, max, orderby, desc} = req.query;
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -15,16 +15,73 @@ router.get("/", async (req, res) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
+    min=parseInt(min);
+    max= parseInt(max);
+    desc=parseInt(desc);
+    var score;
 
-    const scores = await client.score.findMany(
-        {
-            skip: (page-1)*take,
-            take: take,
-            include: {
-                group: true
+    if(!desc ){
+        desc="asc";
+    }else{
+        desc="desc";
+    }
+
+    if(!min || min <0){
+        min=-1;
+    }else{
+        min=min-1;
+    }
+
+    if(!max ){
+       max= Number.MAX_SAFE_INTEGER;
+
+        
+    }else{
+        max=max+1;
+        
+    }
+
+    if(orderby==="points"){
+        scores = await client.score.findMany(
+            {
+                skip: (page-1)*take,
+                take: take,
+                include: {
+                    group: true
+                },
+                orderBy:{
+                    points: desc
+                },
+                where:{
+                    points:{
+                        gt:min,
+                        lt:max
+                    } 
+                }
             }
-        }
-    );
+        );
+
+    }else{
+        scores = await client.score.findMany(
+            {
+                skip: (page-1)*take,
+                take: take,
+                include: {
+                    group: true
+                },
+                orderBy:{
+                    id: desc
+                },
+                where:{
+                    points:{
+                        gt:min,
+                        lt:max
+                    } 
+                }
+            }
+        );
+    }
+    
     res.status(200).json(scores);
 });
 
@@ -44,7 +101,7 @@ router.get("/:id", async (req, res) => {
 // Get score for a player
 router.get("/player/:id", async (req, res) => {
     const { id } = req.params;
-    var { page, size } = req.query;
+    var { page, size, min, max, orderby, desc } = req.query;
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -53,15 +110,70 @@ router.get("/player/:id", async (req, res) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
+    min=parseInt(min);
+    max= parseInt(max);
+    desc=parseInt(desc);
+    var score;
 
-    const score = await client.score.findMany({
-        where: { group: {some: {id: parseInt(id)}} },
-        skip: (page-1)*take,
-        take: take,
-        include: {
-            group: true
-        }
-    });
+    if(!desc ){
+        desc="asc";
+    }else{
+        desc="desc";
+    }
+
+    if(!min || min <0){
+        min=-1;
+    }else{
+        min=min-1;
+    }
+
+    if(!max ){
+       max= Number.MAX_SAFE_INTEGER;
+
+        
+    }else{
+        max=max+1;
+        
+    }
+
+    if(orderby==="points"){
+        score = await client.score.findMany({
+            where: { 
+                group: {some: {id: parseInt(id)}},
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                points: desc
+            }
+        });
+    }else{
+        score = await client.score.findMany({
+            where: { 
+                group: {some: {id: parseInt(id)}},
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                id: desc
+            }
+        });
+    }
+
     if(score === null){
         res.status(404).send("Player not found");
         return;
@@ -72,7 +184,7 @@ router.get("/player/:id", async (req, res) => {
 // Get score for a dungeon
 router.get("/dungeon/:id", async (req, res) => {
     const { id } = req.params;
-    var { page, size } = req.query;
+    var { page, size, min, max, orderby, desc } = req.query;
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -81,15 +193,72 @@ router.get("/dungeon/:id", async (req, res) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
+    min=parseInt(min);
+    max= parseInt(max);
+    desc=parseInt(desc);
+    var score;
+
+    if(!desc ){
+        desc="asc";
+    }else{
+        desc="desc";
+    }
+
+    if(!min || min <0){
+        min=-1;
+    }else{
+        min=min-1;
+    }
+
+    if(!max ){
+       max= Number.MAX_SAFE_INTEGER;
+
+        
+    }else{
+        max=max+1;
+        
+    }
+
+    if( orderby==="points"){
+        score = await client.score.findMany({
+            where: { 
+                dungeonId: parseInt(id),
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                points: desc
+            }
+        });
+
+    }else{
+        score = await client.score.findMany({
+            where: { 
+                dungeonId: parseInt(id),
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                id: desc
+            }
+        });
+    }
     
-    const score = await client.score.findMany({
-        where: { dungeonId: parseInt(id) },
-        skip: (page-1)*take,
-        take: take,
-        include: {
-            group: true
-        }
-    });
+    
     if(score === null){
         res.status(404).send("Dungeon not found");
         return;
