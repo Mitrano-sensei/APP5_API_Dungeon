@@ -6,6 +6,7 @@ const router = Router();
 
 // Get all scores
 router.get("/", async (req, res) => {
+    // Paramètres de requête pour la pagination : page et size, des entiers positifs
     var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
@@ -30,6 +31,7 @@ router.get("/", async (req, res) => {
 
 // Get score for an id
 router.get("/:id", async (req, res) => {
+    // id: entier positif
     const { id } = req.params;
     const score = await client.score.findUnique({
         where: { id: parseInt(id) }
@@ -43,6 +45,7 @@ router.get("/:id", async (req, res) => {
 
 // Get score for a player
 router.get("/player/:id", async (req, res) => {
+    // id: entier positif, id du joueur recherché
     const { id } = req.params;
     var { page, size } = req.query;
     if(page===undefined || page<=0){
@@ -72,6 +75,7 @@ router.get("/player/:id", async (req, res) => {
 // Get score for a dungeon
 router.get("/dungeon/:id", async (req, res) => {
     const { id } = req.params;
+    // Paramètres de requête pour la pagination : page et size, des entiers positifs
     var { page, size } = req.query;
     if(page===undefined || page<=0){
         page=1;
@@ -99,6 +103,9 @@ router.get("/dungeon/:id", async (req, res) => {
 
 // Create a score
 router.post("/", async (req, res) => { 
+    // dungeonId: entier positif, l'id du donjon concerné
+    // playersIds: array d'entiers positifs: les id des joueurs concernés
+    // points: entier positif, le nombre de points associé au score
     const { dungeonId, playerIds, points  } = req.body;
     // TODO : Validation
 
@@ -125,6 +132,7 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res)=>{
+    // id: entier positif, l'id du score à supprimer
 	const {id} = req.params;
 	
 	const score = await client.score.delete({
@@ -140,6 +148,8 @@ router.delete("/:id", async (req, res)=>{
 // Update a score
 // In some cases we have to recreate a score instead of updating it
 router.put("/:id", async (req, res)=>{
+    // On peut recevoir un ou plusieurs paramètres à mettre à jour parmi les suivants :
+    // dungeonId, playerIds, points
     const {id} = req.params;
     const {dungeonId, playerIds, points } = req.body;
     let score;

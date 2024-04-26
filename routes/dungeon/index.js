@@ -6,6 +6,7 @@ const router = Router();
 
 // Get all dungeons
 router.get("/", async (req, res) => {
+    // Paramètres de requête pour la pagination : page et size, des entiers positifs
     var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
@@ -20,7 +21,7 @@ router.get("/", async (req, res) => {
 
 // Get dungeon by id
 router.get("/:id", async (req, res) => {
-
+    // id: entier positif, l'id du donjon à renvoyer
     const { id } = req.params;
     const dungeon = await client.dungeon.findUnique({
         where: { id: parseInt(id) }
@@ -34,6 +35,7 @@ router.get("/:id", async (req, res) => {
 
 // Get dungeon by name
 router.get("/name/:name", async (req, res) => { 
+    // name: string, le nom du donjon à renvoyer.
     const { name } = req.params;
     const dungeon = await client.dungeon.findUnique({
         where: { name: name }
@@ -58,6 +60,7 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res)=>{
+    // id: entier positif, id du donjon à supprimer
 	const {id}= req.params;
 	
 	const dungeon =await client.dungeon.delete({
@@ -71,6 +74,8 @@ router.delete("/:id", async (req, res)=>{
 });
 
 router.put("/:id", async (req, res)=>{
+    // id: entier positif, id du donjon à modifier
+    // name: string, nouveau nom du donjon
 	const {id} = req.params;
     const {name}= req.body;
 
