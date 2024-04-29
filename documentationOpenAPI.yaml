@@ -370,13 +370,433 @@ paths:
                     type: integer
                   name:
                     type: string
-          
 
-        
-                    
-    
-          
+  /api/scores/:
+    get:
+      parameters:
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+            default: 1
+          required: false
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+            default: 5
+          required: false
+        - name: min
+          in: query
+          description: Le nombre de points maximal (inclus)
+          schema:
+            type: integer
+            default: 0
+          required: false
+        - name: max
+          in: query
+          description: Le nombre de points maximal (inclus)
+          schema:
+            type: integer
+            default: Number.MAX_SAFE_INTEGER
+          required: false
+        - name: orderby
+          in: query
+          description: Le champ selon lequel on trie les résultats (peut valoir "id" ou "points")
+          schema:
+            type: string
+            default: "id"
+          required: false
+        - name: desc
+          in: query
+          description: Trié par ordre décroissant
+          schema:
+            type: boolean
+            default: false
+          required: false
 
-        
-                    
+      description: Donne la liste des scores
+      responses:
+        '200':
+          description: Récupération de la liste des scores réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    dungeonId:
+                      type: string
+                    group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+                    points:
+                      type: integer
     
+    post :
+      description: Ajoute un score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - dungeonId
+                - points
+                - playerIds
+              properties:
+                dungeonId:
+                  type: integer
+                points:
+                  type: integer
+                playerIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '201':
+          description: Insertion du nouveau score réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  dungeonId:
+                    type: integer
+                  points:
+                    type: integer
+                  group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+  /api/scores/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du score
+          schema:
+            type: integer
+          required: true
+        
+        
+        
+      description: Donne les informations du score
+      responses:
+        '200':
+          description: Récupération des informations du score réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  dungeonId:
+                    type: integer
+                  points:
+                    type: integer
+                  group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+
+
+
+
+    put: 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID du score
+      description: Modifie un score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dungeonId:
+                  type: integer
+                points:
+                  type: integer
+                playerIds:
+                  type: array
+                  items:
+                    type: integer
+      
+      responses:
+        '201':
+          description: Modification du score réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  dungeonId:
+                    type: integer
+                  points:
+                    type: integer
+                  group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+
+        '404':
+          description: Nom Invalide, ou score non trouvé, ou erreur durant la modification 
+          content:
+            text/plain:
+              schema:
+                type: string
+    
+    delete: 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID du score
+      description: Supprime un score
+      
+      responses:
+        '201':
+          description: Suppression du score réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  dungeonId:
+                    type: integer
+                  points:
+                    type: integer
+                  group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+
+        '404':
+          description: Score non trouvé 
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/scores/player/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du joueur
+          schema:
+            type: integer
+          required: true
+
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+            default: 1
+          required: false
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+            default: 5
+          required: false
+        
+        - name: min
+          in: query
+          description: Le nombre de points maximal (inclus)
+          schema:
+            type: integer
+            default: 0
+          required: false
+        - name: max
+          in: query
+          description: Le nombre de points maximal (inclus)
+          schema:
+            type: integer
+            default: Number.MAX_SAFE_INTEGER
+          required: false
+        - name: orderby
+          in: query
+          description: Le champ selon lequel on trie les résultats (peut valoir "id" ou "points")
+          schema:
+            type: string
+            default: "id"
+          required: false
+        - name: desc
+          in: query
+          description: Trié par ordre décroissant
+          schema:
+            type: boolean
+            default: false
+          required: false
+        
+      description: Donne les scores du joueur
+      responses:
+        '200':
+          description: Récupération des informations réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    dungeonId:
+                      type: integer
+                    points:
+                      type: integer
+                    group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+
+  /api/scores/dungeon/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: L'identifiant du joueur
+          schema:
+            type: integer
+          required: true
+
+        - name: page
+          in: query
+          description: Le numéro de la page
+          schema:
+            type: integer
+            default: 1
+          required: false
+        - name: size
+          in: query
+          description: La taille de la page
+          schema:
+            type: integer
+            default: 5
+          required: false
+        - name: min
+          in: query
+          description: Le nombre de points maximal (inclus)
+          schema:
+            type: integer
+            default: 0
+          required: false
+        - name: max
+          in: query
+          description: Le nombre de points maximal (inclus)
+          schema:
+            type: integer
+            default: Number.MAX_SAFE_INTEGER
+          required: false
+        - name: orderby
+          in: query
+          description: Le champ selon lequel on trie les résultats (peut valoir "id" ou "points")
+          schema:
+            type: string
+            default: "id"
+          required: false
+        - name: desc
+          in: query
+          description: Trié par ordre décroissant
+          schema:
+            type: boolean
+            default: false
+          required: false
+        
+      description: Donne les scores du donjon
+      responses:
+        '200':
+          description: Récupération des informations réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    dungeonId:
+                      type: integer
+                    points:
+                      type: integer
+                    group:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          
+
+
+  
+      
+
+
+  
+      
