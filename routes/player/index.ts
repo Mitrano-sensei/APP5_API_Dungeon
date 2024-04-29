@@ -1,11 +1,11 @@
-const { Router } = require("express");
-const { client } = require("../../prisma/database");
-const {pagesize}=require("../../queryConfig");
+import express from 'express';
+import client from "../../prisma/database";
+import pagesize from "../../queryConfig";
 
-const router = Router();
+const router = express.Router();
 
 //Pagination
-router.get("/:page",async (req,res)=>{
+router.get("/:page",async (req: any,res: any)=>{
     var {page} =req.params;
     if(page===undefined || page<=0){
         page=1;
@@ -19,20 +19,20 @@ router.get("/:page",async (req,res)=>{
 });
 
 // Récupérer tous les livres
-router.get("/", async (req, res) => {
+router.get("/", async (req: any, res: any) => {
     var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
     }
     var take = (size === undefined || size <= 0) ? pagesize : size;
     const players=await client.player.findMany({
-        skip: parseInt((page-1)*take),
+        skip: (page-1)*take,
         take: parseInt(take),
     })
     res.status(200).json(players);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: any, res: any) => {
     const { id } = req.params;
     const player = await client.player.findUnique({
         where: { id: parseInt(id) }
@@ -44,7 +44,7 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(player);
 });
 
-router.get("/name/:name", async (req, res) => {
+router.get("/name/:name", async (req: any, res: any) => {
     const { name } = req.params;
     const player = await client.player.findUnique({
         where: { name: name }
@@ -56,7 +56,7 @@ router.get("/name/:name", async (req, res) => {
     res.status(200).json(player);
 });
 
-router.post("/", async (req, res) => { 
+router.post("/", async (req: any, res: any) => { 
     const { name } = req.body;
     // TODO : Validation
 
@@ -68,11 +68,11 @@ router.post("/", async (req, res) => {
     res.status(201).json(player);
 });
 
-router.delete("/:id", async (req, res)=>{
+router.delete("/:id", async (req: any, res: any)=>{
 	const {id}= req.params;
 	const player =await client.player.delete({
 	  where: { id: parseInt(id)},
-	}).catch((e)=>{
+	}).catch((e: any)=>{
         res.status(404).send("Player not found");
         return;
     });
@@ -80,7 +80,7 @@ router.delete("/:id", async (req, res)=>{
 	
 });
 
-router.put("/:id", async (req, res)=>{
+router.put("/:id", async (req: any, res: any)=>{
 	const {id} = req.params;
     const {name}= req.body;
     
@@ -103,4 +103,4 @@ router.put("/:id", async (req, res)=>{
 });
 
 
-module.exports = router;
+export default router;

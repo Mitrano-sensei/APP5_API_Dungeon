@@ -1,11 +1,11 @@
-const { Router } = require("express");
-const { client } = require("../../prisma/database");
-const {pagesize}=require("../../queryConfig");
+import express from 'express';
+import client from "../../prisma/database";
+import pagesize from "../../queryConfig";
 
-const router = Router();
+const router = express.Router();
 
 // Get all scores
-router.get("/", async (req, res) => {
+router.get("/", async (req: any, res: any) => {
     var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
 });
 
 // Get score for an id
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: any, res: any) => {
     const { id } = req.params;
     const score = await client.score.findUnique({
         where: { id: parseInt(id) }
@@ -42,7 +42,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Get score for a player
-router.get("/player/:id", async (req, res) => {
+router.get("/player/:id", async (req: any, res: any) => {
     const { id } = req.params;
     var { page, size } = req.query;
     if(page===undefined || page<=0){
@@ -70,7 +70,7 @@ router.get("/player/:id", async (req, res) => {
 });
 
 // Get score for a dungeon
-router.get("/dungeon/:id", async (req, res) => {
+router.get("/dungeon/:id", async (req: any, res: any) => {
     const { id } = req.params;
     var { page, size } = req.query;
     if(page===undefined || page<=0){
@@ -98,7 +98,7 @@ router.get("/dungeon/:id", async (req, res) => {
 });
 
 // Create a score
-router.post("/", async (req, res) => { 
+router.post("/", async (req: any, res: any) => { 
     const { dungeonId, playerIds, points  } = req.body;
     // TODO : Validation
 
@@ -124,7 +124,7 @@ router.post("/", async (req, res) => {
     res.status(201).json(score);
 });
 
-router.delete("/:id", async (req, res)=>{
+router.delete("/:id", async (req: any, res: any)=>{
 	const {id} = req.params;
 	
 	const score = await client.score.delete({
@@ -137,7 +137,7 @@ router.delete("/:id", async (req, res)=>{
 	
 });
 
-router.put("/:id", async (req, res)=>{
+router.put("/:id", async (req: any, res: any)=>{
     const {id} = req.params;
     const {dungeonId, playerIds, points } = req.body;
     let score;
@@ -152,7 +152,7 @@ router.put("/:id", async (req, res)=>{
 
     if (!oldScore) return res.status(400).json({error: "Score not found"});
 
-    const newGroup = [];
+    const newGroup: any = [];
 
     if (dungeonId){
         const dungeon = await client.dungeon.findUnique({
@@ -162,8 +162,8 @@ router.put("/:id", async (req, res)=>{
     }
 
     const data = {
-        dungeon: {connect: {id: dungeonId ? parseInt(dungeonId) : parseInt(oldScore.dungeonId)}},
-        points: points ? parseInt(points) : parseInt(oldScore.points),
+        dungeon: {connect: {id: dungeonId ? parseInt(dungeonId) : oldScore.dungeonId}},
+        points: points ? parseInt(points) : oldScore.points,
         group: {connect: []}    // Ignored in case of update
     }
 
@@ -196,4 +196,4 @@ router.put("/:id", async (req, res)=>{
     return res.status(201).json(score);
 });
 
-module.exports = router;
+export default router;
