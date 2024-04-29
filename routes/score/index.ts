@@ -6,7 +6,10 @@ const router = express.Router();
 
 // Get all scores
 router.get("/", async (req: any, res: any) => {
-    var {page, size} = req.query;
+
+    // Paramètres de requête pour la pagination : page et size, des entiers positifs
+    var {page, size, min, max, orderby, desc} = req.query;
+
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -15,16 +18,73 @@ router.get("/", async (req: any, res: any) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
+    min=parseInt(min);
+    max= parseInt(max);
+    desc=parseInt(desc);
+    var score;
 
-    const scores = await client.score.findMany(
-        {
-            skip: (page-1)*take,
-            take: take,
-            include: {
-                group: true
+    if(!desc ){
+        desc="asc";
+    }else{
+        desc="desc";
+    }
+
+    if(!min || min <0){
+        min=-1;
+    }else{
+        min=min-1;
+    }
+
+    if(!max ){
+       max= Number.MAX_SAFE_INTEGER;
+
+        
+    }else{
+        max=max+1;
+        
+    }
+
+    if(orderby==="points"){
+        score = await client.score.findMany(
+            {
+                skip: (page-1)*take,
+                take: take,
+                include: {
+                    group: true
+                },
+                orderBy:{
+                    points: desc
+                },
+                where:{
+                    points:{
+                        gt:min,
+                        lt:max
+                    } 
+                }
             }
-        }
-    );
+        );
+
+    }else{
+        score = await client.score.findMany(
+            {
+                skip: (page-1)*take,
+                take: take,
+                include: {
+                    group: true
+                },
+                orderBy:{
+                    id: desc
+                },
+                where:{
+                    points:{
+                        gt:min,
+                        lt:max
+                    } 
+                }
+            }
+        );
+    }
+    
     res.status(200).json(scores);
 });
 
@@ -44,7 +104,7 @@ router.get("/:id", async (req: any, res: any) => {
 // Get score for a player
 router.get("/player/:id", async (req: any, res: any) => {
     const { id } = req.params;
-    var { page, size } = req.query;
+    var { page, size, min, max, orderby, desc } = req.query;
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -53,15 +113,70 @@ router.get("/player/:id", async (req: any, res: any) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
+    min=parseInt(min);
+    max= parseInt(max);
+    desc=parseInt(desc);
+    var score;
 
-    const score = await client.score.findMany({
-        where: { group: {some: {id: parseInt(id)}} },
-        skip: (page-1)*take,
-        take: take,
-        include: {
-            group: true
-        }
-    });
+    if(!desc ){
+        desc="asc";
+    }else{
+        desc="desc";
+    }
+
+    if(!min || min <0){
+        min=-1;
+    }else{
+        min=min-1;
+    }
+
+    if(!max ){
+       max= Number.MAX_SAFE_INTEGER;
+
+        
+    }else{
+        max=max+1;
+        
+    }
+
+    if(orderby==="points"){
+        score = await client.score.findMany({
+            where: { 
+                group: {some: {id: parseInt(id)}},
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                points: desc
+            }
+        });
+    }else{
+        score = await client.score.findMany({
+            where: { 
+                group: {some: {id: parseInt(id)}},
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                id: desc
+            }
+        });
+    }
+
     if(score === null){
         res.status(404).send("Player not found");
         return;
@@ -72,7 +187,11 @@ router.get("/player/:id", async (req: any, res: any) => {
 // Get score for a dungeon
 router.get("/dungeon/:id", async (req: any, res: any) => {
     const { id } = req.params;
-    var { page, size } = req.query;
+
+    // Paramètres de requête pour la pagination : page et size, des entiers positifs
+
+    var { page, size, min, max, orderby, desc } = req.query;
+
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -81,15 +200,72 @@ router.get("/dungeon/:id", async (req: any, res: any) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
+    min=parseInt(min);
+    max= parseInt(max);
+    desc=parseInt(desc);
+    var score;
+
+    if(!desc ){
+        desc="asc";
+    }else{
+        desc="desc";
+    }
+
+    if(!min || min <0){
+        min=-1;
+    }else{
+        min=min-1;
+    }
+
+    if(!max ){
+       max= Number.MAX_SAFE_INTEGER;
+
+        
+    }else{
+        max=max+1;
+        
+    }
+
+    if( orderby==="points"){
+        score = await client.score.findMany({
+            where: { 
+                dungeonId: parseInt(id),
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                points: desc
+            }
+        });
+
+    }else{
+        score = await client.score.findMany({
+            where: { 
+                dungeonId: parseInt(id),
+                points:{
+                    gt:min,
+                    lt:max
+                } 
+            },
+            skip: (page-1)*take,
+            take: take,
+            include: {
+                group: true
+            },
+            orderBy:{
+                id: desc
+            }
+        });
+    }
     
-    const score = await client.score.findMany({
-        where: { dungeonId: parseInt(id) },
-        skip: (page-1)*take,
-        take: take,
-        include: {
-            group: true
-        }
-    });
+    
     if(score === null){
         res.status(404).send("Dungeon not found");
         return;
@@ -99,6 +275,9 @@ router.get("/dungeon/:id", async (req: any, res: any) => {
 
 // Create a score
 router.post("/", async (req: any, res: any) => { 
+    // dungeonId: entier positif, l'id du donjon concerné
+    // playersIds: array d'entiers positifs: les id des joueurs concernés
+    // points: entier positif, le nombre de points associé au score
     const { dungeonId, playerIds, points  } = req.body;
     // TODO : Validation
 
@@ -125,6 +304,7 @@ router.post("/", async (req: any, res: any) => {
 });
 
 router.delete("/:id", async (req: any, res: any)=>{
+    // id: entier positif, l'id du score à supprimer
 	const {id} = req.params;
 	
 	const score = await client.score.delete({
@@ -137,7 +317,11 @@ router.delete("/:id", async (req: any, res: any)=>{
 	
 });
 
+// Update a score
+// In some cases we have to recreate a score instead of updating it
 router.put("/:id", async (req: any, res: any)=>{
+    // On peut recevoir un ou plusieurs paramètres à mettre à jour parmi les suivants :
+    // dungeonId, playerIds, points
     const {id} = req.params;
     const {dungeonId, playerIds, points } = req.body;
     let score;

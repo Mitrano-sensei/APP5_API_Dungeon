@@ -19,7 +19,6 @@ router.get("/", async (req: any, res: any) => {
 });
 
 router.get("/:id", async (req: any, res: any) => {
-
     const { id } = req.params;
     const dungeon = await client.dungeon.findUnique({
         where: { id: parseInt(id) }

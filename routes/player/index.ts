@@ -18,8 +18,9 @@ router.get("/:page",async (req: any,res: any)=>{
     res.status(200).json(players);
 });
 
-// Récupérer tous les livres
+// Get all players
 router.get("/", async (req: any, res: any) => {
+    // Paramètres de requête pour la pagination : page et size, des entiers positifs
     var {page, size} = req.query;
     if(page===undefined || page<=0){
         page=1;
@@ -32,7 +33,9 @@ router.get("/", async (req: any, res: any) => {
     res.status(200).json(players);
 });
 
+// Get player by id
 router.get("/:id", async (req: any, res: any) => {
+    // id: entier positif, id du joueur à renvoyer
     const { id } = req.params;
     const player = await client.player.findUnique({
         where: { id: parseInt(id) }
@@ -44,7 +47,9 @@ router.get("/:id", async (req: any, res: any) => {
     res.status(200).json(player);
 });
 
+// Get player by name
 router.get("/name/:name", async (req: any, res: any) => {
+    // name: string, nom du joueur à renvoyer
     const { name } = req.params;
     const player = await client.player.findUnique({
         where: { name: name }
@@ -57,6 +62,7 @@ router.get("/name/:name", async (req: any, res: any) => {
 });
 
 router.post("/", async (req: any, res: any) => { 
+    // name: string, nom du joueur à créer
     const { name } = req.body;
     // TODO : Validation
 
@@ -69,6 +75,7 @@ router.post("/", async (req: any, res: any) => {
 });
 
 router.delete("/:id", async (req: any, res: any)=>{
+    // id: entier positif, id du joueur à supprimer
 	const {id}= req.params;
 	const player =await client.player.delete({
 	  where: { id: parseInt(id)},
@@ -81,6 +88,8 @@ router.delete("/:id", async (req: any, res: any)=>{
 });
 
 router.put("/:id", async (req: any, res: any)=>{
+    // id: entier positif, id du joueur à modifer
+    // name: string, nouveau nom du joueur
 	const {id} = req.params;
     const {name}= req.body;
     
