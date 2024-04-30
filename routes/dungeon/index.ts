@@ -14,13 +14,19 @@ router.get("/", async (req: any, res: any) => {
         page=1;
     }
     var take = (size === undefined || size <= 0) ? pagesize : size;
-    const dungeons= repository.getAll(page-1, take);
+    const dungeons= await repository.getAll(page-1, take).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     res.status(200).json(dungeons);
 });
 
 router.get("/:id", async (req: any, res: any) => {
     const { id } = req.params;
-    const dungeon = await repository.findById(parseInt(id));
+    const dungeon = await repository.findById(parseInt(id)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     if(dungeon === null){
         res.status(404).send("Dungeon not found");
         return;
@@ -30,7 +36,10 @@ router.get("/:id", async (req: any, res: any) => {
 
 router.get("/name/:name", async (req: any, res: any) => { 
     const { name } = req.params;
-    const dungeon = await repository.findByName(name);
+    const dungeon = await repository.findByName(name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     if(dungeon === null){
         res.status(404).send("Dungeon not found");
         return;
@@ -42,14 +51,20 @@ router.post("/", async (req: any, res: any) => {
     const { name } = req.body;
     // TODO : Validation
 
-    const dungeon = await repository.save(name);
+    const dungeon = await repository.save(name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     res.status(201).json(dungeon);
 });
 
 router.delete("/:id", async (req: any, res: any)=>{
 	const {id}= req.params;
 	
-	const dungeon =await repository.delete(parseInt(id));
+	const dungeon =await repository.delete(parseInt(id)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     res.status(201).json(dungeon);
 	
 });
@@ -64,7 +79,10 @@ router.put("/:id", async (req: any, res: any)=>{
         return;
     }
 
-    const dungeon =await repository.update(parseInt(id), name);
+    const dungeon =await repository.update(parseInt(id), name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     res.status(201).json(dungeon);
 	
 });

@@ -15,7 +15,10 @@ router.get("/", async (req: any, res: any) => {
     }
     var take = (size === undefined || size <= 0) ? pagesize : size;
     
-    const players=await repository.getAll(page, parseInt(take));
+    const players=await repository.getAll(page, parseInt(take)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
 
     res.status(200).json(players);
 });
@@ -24,7 +27,10 @@ router.get("/", async (req: any, res: any) => {
 router.get("/:id", async (req: any, res: any) => {
     // id: entier positif, id du joueur à renvoyer
     const { id } = req.params;
-    const player = await repository.findById(parseInt(id));
+    const player = await repository.findById(parseInt(id)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     if(player === null){
         res.status(404).send("Player not found");
         return;
@@ -36,7 +42,10 @@ router.get("/:id", async (req: any, res: any) => {
 router.get("/name/:name", async (req: any, res: any) => {
     // name: string, nom du joueur à renvoyer
     const { name } = req.params;
-    const player = await repository.findByName(name);
+    const player = await repository.findByName(name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     if(player === null){
         res.status(404).send("Player not found");
         return;
@@ -47,14 +56,20 @@ router.get("/name/:name", async (req: any, res: any) => {
 router.post("/", async (req: any, res: any) => { 
     // name: string, nom du joueur à créer
     const { name } = req.body;
-    const player = await repository.save(name);
+    const player = await repository.save(name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     res.status(201).json(player);
 });
 
 router.delete("/:id", async (req: any, res: any)=>{
     // id: entier positif, id du joueur à supprimer
 	const {id}= req.params;
-    const player = repository.deleteById(parseInt(id));
+    const player = repository.deleteById(parseInt(id)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     if (player === null){
         res.status(404).send("Player not found");
         return;
@@ -75,7 +90,10 @@ router.put("/:id", async (req: any, res: any)=>{
         return;
     }
 
-    const player =await repository.update(parseInt(id), name);
+    const player =await repository.update(parseInt(id), name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
     if (player === null) {
         res.status(404).send("Player not found or Error while updating player.");
         return;
