@@ -2,6 +2,7 @@ import express from 'express';
 import pagesize from "../../queryConfig";
 import { PlayerRepository } from '../../src/interfaces/repository/player.repository';
 import { PrismaPlayerRepository } from '../../src/implementation/repository/prisma/player.repository';
+import { Schemas } from '../../schemas/index'
 
 const router = express.Router();
 const repository:PlayerRepository = new PrismaPlayerRepository();
@@ -19,7 +20,7 @@ router.get("/", async (req: any, res: any) => {
         res.status(400).send("Error: "+err);
         return;
     });
-
+    console.log(Schemas.playerSchema.validate(players));
     res.status(200).json(players);
 });
 

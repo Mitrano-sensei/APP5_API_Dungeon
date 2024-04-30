@@ -6,6 +6,9 @@ export module Schemas {
         id: Joi.number().integer().min(0).required(),
         name: Joi.string().required()
     });
+
+    export const playersSchema: any = Joi.array()
+        .items(playerSchema);
     
     export const dungeonSchema: any = Joi.object({
         id: Joi.number().integer().min(0).required(),
