@@ -85,7 +85,7 @@ router.get("/", async (req: any, res: any) => {
         );
     }
     
-    res.status(200).json(scores);
+    res.status(200).json(score);
 });
 
 // Get score for an id
