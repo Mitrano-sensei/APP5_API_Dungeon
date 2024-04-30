@@ -14,6 +14,9 @@ export module Schemas {
         id: Joi.number().integer().min(0).required(),
         name: Joi.string().required()
     });
+
+    export const dungeonsSchema: any = Joi.array()
+        .items(dungeonSchema);
     
     export const scoreSchema: any = Joi.object({
         id: Joi.number().integer().min(0).required(),
@@ -21,6 +24,9 @@ export module Schemas {
         points: Joi.number().integer().min(0).required(),
         group: Joi.array().items(playerSchema).required()
     });
+
+    export const scoresSchema: any = Joi.array()
+        .items(scoreSchema);
     
     export const playersGetSchema: any = Joi.object({
         page: Joi.number().integer().min(1),
@@ -32,15 +38,15 @@ export module Schemas {
     });
     
     export const playersGetByNameSchema: any = Joi.object({
-        name: Joi.string().alphanum().required()
+        name: Joi.string().required()
     });
     
     export const playersPostSchema: any = Joi.object({
-        name: Joi.string().alphanum().required()
+        name: Joi.string().required()
     });
     
     export const playersPutSchema: any = Joi.object({
-        name: Joi.string().alphanum().required(),
+        name: Joi.string().required(),
         id: Joi.number().integer().min(0).required()
     });
     
@@ -107,15 +113,15 @@ export module Schemas {
     });
     
     export const dungeonsGetByNameSchema: any = Joi.object({
-        name: Joi.string().alphanum().required()
+        name: Joi.string().required()
     });
     
     export const dungeonsPostSchema: any = Joi.object({
-        name: Joi.string().alphanum().required()
+        name: Joi.string().required()
     });
     
     export const dungeonsPutSchema: any = Joi.object({
-        name: Joi.string().alphanum().required(),
+        name: Joi.string().required(),
         id: Joi.number().integer().min(0).required()
     });
     

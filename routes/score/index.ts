@@ -2,12 +2,18 @@ import express from 'express';
 import pagesize from "../../queryConfig";
 import { ScoreRepository } from '../../src/interfaces/repository/score.repository';
 import { PrismaScoreRepository } from '../../src/implementation/repository/prisma/score.repository';
+import { Schemas } from '../../schemas/index';
 
 const router = express.Router();
 const repository : ScoreRepository = new PrismaScoreRepository();
 
 // Get all scores
 router.get("/", async (req: any, res: any) => {
+    var { error, value } = Schemas.scoresGetSchema.validate(req.query);
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
 
     // Paramètres de requête pour la pagination : page et size, des entiers positifs
     var {page, size, min, max, orderby, desc} = req.query;
@@ -48,24 +54,49 @@ router.get("/", async (req: any, res: any) => {
         res.status(404).send(e.message);
         return;
     });
-    
-    res.status(200).json(score);
+    var { error, value } = Schemas.scoresSchema.validate(score);
+    if (error === undefined) {
+        res.status(200).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 // Get score for an id
 router.get("/:id", async (req: any, res: any) => {
+    var { error, value } = Schemas.scoresGetByIdSchema.validate(req.params);
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
     const { id } = req.params;
     const score = await repository.findById(parseInt(id)).catch(e => {
         res.status(404).send(e.message);
         return;
     });
-    res.status(200).json(score);
+    var { error, value } = Schemas.scoreSchema.validate(score);
+    if (error === undefined) {
+        res.status(200).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 // Get score for a player
 router.get("/player/:id", async (req: any, res: any) => {
     const { id } = req.params;
     var { page, size, min, max, orderby, desc } = req.query;
+
+    var { error, value } = Schemas.scoresGetByPlayerSchema.validate(
+        { id, page, size, min, max, orderby, desc }
+    );
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
+
     if(page===undefined || page<=0){
         page=1;
     } 
@@ -108,7 +139,13 @@ router.get("/player/:id", async (req: any, res: any) => {
         res.status(404).send("Player not found");
         return;
     }
-    res.status(200).json(score);
+    var { error, value } = Schemas.scoresSchema.validate(score);
+    if (error === undefined) {
+        res.status(200).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 // Get score for a dungeon
@@ -118,6 +155,14 @@ router.get("/dungeon/:id", async (req: any, res: any) => {
     // Paramètres de requête pour la pagination : page et size, des entiers positifs
 
     var { page, size, min, max, orderby, desc } = req.query;
+
+    var { error, value } = Schemas.scoresGetByDungeonSchema.validate(
+        { id, page, size, min, max, orderby, desc }
+    );
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
 
     if(page===undefined || page<=0){
         page=1;
@@ -162,11 +207,22 @@ router.get("/dungeon/:id", async (req: any, res: any) => {
         res.status(404).send("Dungeon not found");
         return;
     }
-    res.status(200).json(score);
+    var { error, value } = Schemas.scoresSchema.validate(score);
+    if (error === undefined) {
+        res.status(200).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 // Create a score
 router.post("/", async (req: any, res: any) => { 
+    var { error, value } = Schemas.scoresPostSchema.validate(req.body);
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
     // dungeonId: entier positif, l'id du donjon concerné
     // playersIds: array d'entiers positifs: les id des joueurs concernés
     // points: entier positif, le nombre de points associé au score
@@ -175,19 +231,35 @@ router.post("/", async (req: any, res: any) => {
     const score = await repository.save(points, playerIds, dungeonId).catch(e => {
         res.status(404).send(e.message);
         return;
-    });;
-    res.status(201).json(score);
+    });
+    var { error, value } = Schemas.scoreSchema.validate(score);
+    if (error === undefined) {
+        res.status(201).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 router.delete("/:id", async (req: any, res: any)=>{
+    var { error, value } = Schemas.scoresDeleteSchema.validate(req.params);
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
     // id: entier positif, l'id du score à supprimer
 	const {id} = req.params;
 	const score = await repository.delete(parseInt(id)).catch(e => {
         res.status(404).send(e.message);
         return;
     });
-    res.status(201).json(score);
-	
+    var { error, value } = Schemas.scoreSchema.validate(score);
+    if (error === undefined) {
+        res.status(201).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 // Update a score
@@ -197,6 +269,14 @@ router.put("/:id", async (req: any, res: any)=>{
     // dungeonId, playerIds, points
     const {id} = req.params;
     const {dungeonId, playerIds, points } = req.body;
+
+    var { error, value } = Schemas.scoresPutSchema.validate(
+        { id, dungeonId, playerIds, points});
+    if (error !== undefined) {
+        res.status(300).send("Error: "+ error);
+        return;
+    }
+
     let score;
 
     if(dungeonId === undefined && playerIds === undefined && points === undefined){
@@ -209,7 +289,13 @@ router.put("/:id", async (req: any, res: any)=>{
         return;
     });;
 
-    return res.status(201).json(score);
+    var { error, value } = Schemas.scoreSchema.validate(score);
+    if (error === undefined) {
+        res.status(201).json(score);
+    }
+    else {
+        res.status(500).send("Error: "+ error);
+    }
 });
 
 export default router;
