@@ -66,7 +66,7 @@ router.post("/", async (req: any, res: any) => {
 router.delete("/:id", async (req: any, res: any)=>{
     // id: entier positif, id du joueur à supprimer
 	const {id}= req.params;
-    const player = repository.deleteById(parseInt(id)).catch((err)=>{
+    const player = await repository.delete(parseInt(id)).catch((err)=>{
         res.status(400).send("Error: "+err);
         return;
     });

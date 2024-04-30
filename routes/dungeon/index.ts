@@ -13,7 +13,7 @@ router.get("/", async (req: any, res: any) => {
     if(page===undefined || page<=0){
         page=1;
     }
-    var take = (size === undefined || size <= 0) ? pagesize : size;
+    var take = (size === undefined || size <= 0) ? pagesize : parseInt(size);
     const dungeons= await repository.getAll(page-1, take).catch((err)=>{
         res.status(400).send("Error: "+err);
         return;

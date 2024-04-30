@@ -23,7 +23,7 @@ export class PrismaPlayerRepository implements PlayerRepository {
         return player;
     }
 
-    async delete(name: string): Promise<Player> {
+    async deleteByName(name: string): Promise<Player> {
         const player = await client.player.delete({
             where: {
                 name
@@ -32,15 +32,12 @@ export class PrismaPlayerRepository implements PlayerRepository {
         return player;
     }
 
-    async deleteById(id: number) : Promise<Player | null> {
-        const player = await client.player.delete({
+    async delete(id: number) : Promise<Player> {
+        return await client.player.delete({
             where: {
                 id
             }
-        }).catch(e => {
-            return null;
         });
-        return player;
     }
 
     async update(id: number, newName: string): Promise<Player | null> {
