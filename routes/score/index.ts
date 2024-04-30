@@ -1,8 +1,10 @@
 import express from 'express';
-import client from "../../prisma/database";
 import pagesize from "../../queryConfig";
+import { ScoreRepository } from '../../src/interfaces/repository/score.repository';
+import { PrismaScoreRepository } from '../../src/implementation/repository/prisma/score.repository';
 
 const router = express.Router();
+const repository : ScoreRepository = new PrismaScoreRepository();
 
 // Get all scores
 router.get("/", async (req: any, res: any) => {
@@ -18,9 +20,9 @@ router.get("/", async (req: any, res: any) => {
     // Make sure they are Int
     page = parseInt(page);
     take = parseInt(take);
-    min=parseInt(min);
-    max= parseInt(max);
-    desc=parseInt(desc);
+    min = parseInt(min);
+    max = parseInt(max);
+    desc = parseInt(desc);
     var score;
 
     if(!desc ){
@@ -37,53 +39,15 @@ router.get("/", async (req: any, res: any) => {
 
     if(!max ){
        max= Number.MAX_SAFE_INTEGER;
-
-        
     }else{
         max=max+1;
-        
     }
 
-    if(orderby==="points"){
-        score = await client.score.findMany(
-            {
-                skip: (page-1)*take,
-                take: take,
-                include: {
-                    group: true
-                },
-                orderBy:{
-                    points: desc
-                },
-                where:{
-                    points:{
-                        gt:min,
-                        lt:max
-                    } 
-                }
-            }
-        );
-
-    }else{
-        score = await client.score.findMany(
-            {
-                skip: (page-1)*take,
-                take: take,
-                include: {
-                    group: true
-                },
-                orderBy:{
-                    id: desc
-                },
-                where:{
-                    points:{
-                        gt:min,
-                        lt:max
-                    } 
-                }
-            }
-        );
-    }
+    // TODO : Orderby, min, max
+    score = await repository.getAll(page, take, min, max, orderby, desc).catch(e => {
+        res.status(404).send(e.message);
+        return;
+    });
     
     res.status(200).json(score);
 });
@@ -91,13 +55,10 @@ router.get("/", async (req: any, res: any) => {
 // Get score for an id
 router.get("/:id", async (req: any, res: any) => {
     const { id } = req.params;
-    const score = await client.score.findUnique({
-        where: { id: parseInt(id) }
-    });
-    if(score === null){
-        res.status(404).send("Player not found");
+    const score = await repository.findById(parseInt(id)).catch(e => {
+        res.status(404).send(e.message);
         return;
-    }
+    });
     res.status(200).json(score);
 });
 
@@ -136,46 +97,12 @@ router.get("/player/:id", async (req: any, res: any) => {
         
     }else{
         max=max+1;
-        
     }
 
-    if(orderby==="points"){
-        score = await client.score.findMany({
-            where: { 
-                group: {some: {id: parseInt(id)}},
-                points:{
-                    gt:min,
-                    lt:max
-                } 
-            },
-            skip: (page-1)*take,
-            take: take,
-            include: {
-                group: true
-            },
-            orderBy:{
-                points: desc
-            }
-        });
-    }else{
-        score = await client.score.findMany({
-            where: { 
-                group: {some: {id: parseInt(id)}},
-                points:{
-                    gt:min,
-                    lt:max
-                } 
-            },
-            skip: (page-1)*take,
-            take: take,
-            include: {
-                group: true
-            },
-            orderBy:{
-                id: desc
-            }
-        });
-    }
+    score = await repository.getAllFromPlayer(page, take, parseInt(id), min, max, orderby, desc).catch(e => {
+        res.status(404).send(e.message);
+        return;
+    });
 
     if(score === null){
         res.status(404).send("Player not found");
@@ -226,45 +153,10 @@ router.get("/dungeon/:id", async (req: any, res: any) => {
         
     }
 
-    if( orderby==="points"){
-        score = await client.score.findMany({
-            where: { 
-                dungeonId: parseInt(id),
-                points:{
-                    gt:min,
-                    lt:max
-                } 
-            },
-            skip: (page-1)*take,
-            take: take,
-            include: {
-                group: true
-            },
-            orderBy:{
-                points: desc
-            }
-        });
-
-    }else{
-        score = await client.score.findMany({
-            where: { 
-                dungeonId: parseInt(id),
-                points:{
-                    gt:min,
-                    lt:max
-                } 
-            },
-            skip: (page-1)*take,
-            take: take,
-            include: {
-                group: true
-            },
-            orderBy:{
-                id: desc
-            }
-        });
-    }
-    
+    score = await repository.getAllFromDungeon(page, take, parseInt(id), min, max, orderby, desc).catch(e => {
+        res.status(404).send(e.message);
+        return;
+    });
     
     if(score === null){
         res.status(404).send("Dungeon not found");
@@ -280,39 +172,20 @@ router.post("/", async (req: any, res: any) => {
     // points: entier positif, le nombre de points associé au score
     const { dungeonId, playerIds, points  } = req.body;
     // TODO : Validation
-
-    let players = [];
-    for(let i=0; i<playerIds.length; i++)
-    {
-        players.push({id: playerIds[i]});
-    }
-    const score = await client.score.create({
-        data: {
-            dungeon: {
-                connect: {
-                    id: dungeonId
-                }
-            },
-            points: points,
-            group: {connect: players}
-        },
-        include: {
-            group: true
-        }
-    });
+    const score = await repository.save(points, playerIds, dungeonId).catch(e => {
+        res.status(404).send(e.message);
+        return;
+    });;
     res.status(201).json(score);
 });
 
 router.delete("/:id", async (req: any, res: any)=>{
     // id: entier positif, l'id du score à supprimer
 	const {id} = req.params;
-	
-	const score = await client.score.delete({
-	  where: { id: parseInt(id)},
-      include: {
-        group: true
-      }
-	});
+	const score = await repository.delete(parseInt(id)).catch(e => {
+        res.status(404).send(e.message);
+        return;
+    });
     res.status(201).json(score);
 	
 });
@@ -326,56 +199,15 @@ router.put("/:id", async (req: any, res: any)=>{
     const {dungeonId, playerIds, points } = req.body;
     let score;
 
-    if (!id) res.status(400).json({error: "Missing id"});
-    const oldScore = await client.score.findUnique({
-        where: { id: parseInt(id) },
-        include: {
-            group: true
-        }
-    });
-
-    if (!oldScore) return res.status(400).json({error: "Score not found"});
-
-    const newGroup: any = [];
-
-    if (dungeonId){
-        const dungeon = await client.dungeon.findUnique({
-            where: { id: parseInt(dungeonId) }
-        })
-        if (!dungeon) return res.status(400).json({error: "Dungeon not found"});
+    if(dungeonId === undefined && playerIds === undefined && points === undefined){
+        res.status(400).send("No data to update");
+        return;
     }
 
-    const data = {
-        dungeon: {connect: {id: dungeonId ? parseInt(dungeonId) : oldScore.dungeonId}},
-        points: points ? parseInt(points) : oldScore.points,
-        group: {connect: []}    // Ignored in case of update
-    }
-
-    if (!playerIds || (playerIds.length === 0 && playerIds != oldScore.group.map(p => p.id))) {
-        score = await client.score.update({
-            where: { id: parseInt(id) },
-            data: data,
-            include: {
-                group: true
-            }
-        });
-    } else {
-        // In that case, delete the old score and replace it with a new connection.
-        for (let i=0; i<playerIds.length; i++) {
-            newGroup.push({id: playerIds[i]});
-        }
-
-        data.group = {connect: newGroup};
-        await client.score.delete({
-            where: { id: parseInt(id) }
-        });
-        score = await client.score.create({
-            data: data,
-            include: {
-                group: true
-            }
-        });
-    }
+    score = await repository.update(parseInt(id), points, playerIds, dungeonId).catch(e => {
+        res.status(404).send(e.message);
+        return;
+    });;
 
     return res.status(201).json(score);
 });
