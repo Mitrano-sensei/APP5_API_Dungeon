@@ -4,38 +4,52 @@ import client from "../../../../prisma/database";
 
 
 export default class PrismaDungeonRepository implements DungeonRepository {
-    save(name: string): Promise<Dungeon> {
-        return client.dungeon.create({
+    async save(name: string): Promise<Dungeon> {
+        return await client.dungeon.create({
             data: {
                 name
             }
         });
     }
-    deleteByName(name: string): Promise<Dungeon> {
-        return client.dungeon.delete({
+    async deleteByName(name: string): Promise<Dungeon> {
+        return await client.dungeon.delete({
             where: {
                 name
             }
         });
     }
-    delete(id: number): Promise<Dungeon> {
-        return client.dungeon.delete({
+    async delete(id: number): Promise<Dungeon> {
+        return await client.dungeon.delete({
             where: {
                 id
             }
         });
     }
-    update(id: number, newName: string): Promise<Dungeon | null> {
-        throw new Error("Method not implemented.");
+    async update(id: number, newName: string): Promise<Dungeon | null> {
+        return await client.dungeon.update({
+            where: { id: id},
+            data: { name: newName },
+        });
     }
-    getAll(page: number, pagesize: number): Promise<Dungeon[]> {
-        throw new Error("Method not implemented.");
+    async getAll(page: number, pagesize: number): Promise<Dungeon[]> {
+        return await client.dungeon.findMany({
+            skip: page * pagesize,
+            take: pagesize
+        });
     }
-    findByName(name: string): Promise<Dungeon | null> {
-        throw new Error("Method not implemented.");
+    async findByName(name: string): Promise<Dungeon | null> {
+        return await client.dungeon.findFirst({
+            where: {
+                name
+            }
+        });
     }
-    findById(id: number): Promise<Dungeon | null> {
-        throw new Error("Method not implemented.");
+    async findById(id: number): Promise<Dungeon | null> {
+        return await client.dungeon.findFirst({
+            where: {
+                id
+            }
+        });
     }
 
 }
