@@ -1,22 +1,10 @@
 import express from 'express';
-import client from "../../prisma/database";
 import pagesize from "../../queryConfig";
+import { PlayerRepository } from '../../src/interfaces/repository/player.repository';
+import { PrismaPlayerRepository } from '../../src/implementation/repository/prisma/player.repository';
 
 const router = express.Router();
-
-//Pagination
-router.get("/:page",async (req: any,res: any)=>{
-    var {page} =req.params;
-    if(page===undefined || page<=0){
-        page=1;
-    }
-    const players=await client.player.findMany({
-        skip: (page-1)*pagesize,
-        take: pagesize,
-    })
-
-    res.status(200).json(players);
-});
+const repository:PlayerRepository = new PrismaPlayerRepository();
 
 // Get all players
 router.get("/", async (req: any, res: any) => {
@@ -26,10 +14,12 @@ router.get("/", async (req: any, res: any) => {
         page=1;
     }
     var take = (size === undefined || size <= 0) ? pagesize : size;
-    const players=await client.player.findMany({
-        skip: (page-1)*take,
-        take: parseInt(take),
-    })
+    
+    const players=await repository.getAll(page, parseInt(take)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
+
     res.status(200).json(players);
 });
 
@@ -37,8 +27,9 @@ router.get("/", async (req: any, res: any) => {
 router.get("/:id", async (req: any, res: any) => {
     // id: entier positif, id du joueur à renvoyer
     const { id } = req.params;
-    const player = await client.player.findUnique({
-        where: { id: parseInt(id) }
+    const player = await repository.findById(parseInt(id)).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
     });
     if(player === null){
         res.status(404).send("Player not found");
@@ -51,8 +42,9 @@ router.get("/:id", async (req: any, res: any) => {
 router.get("/name/:name", async (req: any, res: any) => {
     // name: string, nom du joueur à renvoyer
     const { name } = req.params;
-    const player = await client.player.findUnique({
-        where: { name: name }
+    const player = await repository.findByName(name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
     });
     if(player === null){
         res.status(404).send("Player not found");
@@ -64,12 +56,9 @@ router.get("/name/:name", async (req: any, res: any) => {
 router.post("/", async (req: any, res: any) => { 
     // name: string, nom du joueur à créer
     const { name } = req.body;
-    // TODO : Validation
-
-    const player = await client.player.create({
-        data: {
-            name
-        }
+    const player = await repository.save(name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
     });
     res.status(201).json(player);
 });
@@ -77,12 +66,14 @@ router.post("/", async (req: any, res: any) => {
 router.delete("/:id", async (req: any, res: any)=>{
     // id: entier positif, id du joueur à supprimer
 	const {id}= req.params;
-	const player =await client.player.delete({
-	  where: { id: parseInt(id)},
-	}).catch((e: any)=>{
-        res.status(404).send("Player not found");
+    const player = repository.deleteById(parseInt(id)).catch((err)=>{
+        res.status(400).send("Error: "+err);
         return;
     });
+    if (player === null){
+        res.status(404).send("Player not found");
+        return;
+    }
     res.status(201).json(player);
 	
 });
@@ -99,14 +90,14 @@ router.put("/:id", async (req: any, res: any)=>{
         return;
     }
 
-    const player =await client.player.update({
-        where: { id: parseInt(id)},
-        data: { name: name },
-    }).catch((e)=>{
+    const player =await repository.update(parseInt(id), name).catch((err)=>{
+        res.status(400).send("Error: "+err);
+        return;
+    });
+    if (player === null) {
         res.status(404).send("Player not found or Error while updating player.");
         return;
-    });;
-	
+    }
     res.status(201).json(player);
 	
 });
